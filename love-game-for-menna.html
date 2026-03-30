@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>A Game for My Mannon  ♥</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+    <style>
+        html {
+            height: -webkit-fill-available;
+            scroll-behavior: smooth;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #d4556c;
+            --secondary: #f8b4c0;
+            --accent: #fff0f3;
+            --deep: #6b2737;
+            --text: #4a2530;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, #ffeef2 0%, #fff5f7 50%, #ffe8ee 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            overflow-x: hidden;
+            position: relative;
+            color: var(--text);
+            /* Handle iPhone safe areas */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        html {
+            height: -webkit-fill-available;
+        }
+
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: var(--secondary);
+            opacity: 0;
+            animation: float-up 15s infinite ease-in;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 30px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stage {
+            display: none;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .stage.active {
+            display: block;
+            animation: fadeInUp 0.6s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-heart {
+            font-size: 70px;
+            color: var(--primary);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite ease-in-out;
+            filter: drop-shadow(0 4px 12px rgba(212, 85, 108, 0.3));
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 700;
+            color: var(--deep);
+            margin-bottom: 30px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: var(--deep);
+            margin-bottom: 40px;
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        /* Button styles */
+        .btn-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.4rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(212, 85, 108, 0.4);
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(212, 85, 108, 0.5);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #4caf50, #81c784);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-yes:hover {
+            box-shadow: 0 12px 35px rgba(76, 175, 80, 0.5);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #666, #999);
+            box-shadow: 0 8px 25px rgba(100, 100, 100, 0.3);
+            position: absolute;
+            transition: all 0.2s ease;
+        }
+
+        /* Slider stage */
+        .slider-container {
+            margin: 50px 0;
+            width: 100%;
+        }
+
+        .slider {
+            width: 100%;
+            height: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--deep);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(107, 39, 55, 0.4);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--deep);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(107, 39, 55, 0.4);
+        }
+
+        .slider-value {
+            font-size: 3rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 30px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Multiple choice */
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .choice-btn {
+            background: white;
+            color: var(--text);
+            border: 3px solid var(--secondary);
+            padding: 20px 30px;
+            font-size: 1.3rem;
+            font-family: 'Cormorant Garamond', serif;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 400;
+        }
+
+        .choice-btn:hover {
+            background: var(--accent);
+            border-color: var(--primary);
+            transform: translateX(10px);
+        }
+
+        /* Typing challenge */
+        .typing-container {
+            margin: 50px 0;
+        }
+
+        .typing-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.8rem;
+            font-family: 'Cormorant Garamond', serif;
+            border: 3px solid var(--secondary);
+            border-radius: 15px;
+            text-align: center;
+            background: white;
+            color: var(--text);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .typing-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(212, 85, 108, 0.2);
+        }
+
+        .hint {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 40px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(212, 85, 108, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1rem;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Final message */
+        .love-letter {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(107, 39, 55, 0.15);
+            border: 2px solid rgba(212, 85, 108, 0.2);
+            margin-top: 30px;
+        }
+
+        .love-letter p {
+            font-size: 1.4rem;
+            line-height: 1.9;
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+
+        .love-letter p:last-child {
+            margin-bottom: 0;
+            text-align: right;
+            font-style: italic;
+            color: var(--primary);
+            font-weight: 400;
+            font-size: 1.6rem;
+        }
+
+        .celebration {
+            font-size: 4rem;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .main-heart {
+                font-size: 50px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                margin-bottom: 20px;
+            }
+
+            h2 {
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+                margin-bottom: 30px;
+            }
+            
+            .btn {
+                padding: 18px 40px;
+                font-size: 1.3rem;
+                min-width: 140px;
+                touch-action: manipulation;
+            }
+
+            .btn-container {
+                gap: 20px;
+                min-height: 100px;
+                width: 100%;
+                padding: 0 10px;
+            }
+
+            .btn-no {
+                min-width: 120px;
+            }
+            
+            .love-letter {
+                padding: 30px 20px;
+            }
+
+            .love-letter p {
+                font-size: 1.2rem;
+                line-height: 1.7;
+                margin-bottom: 20px;
+            }
+
+            .love-letter p:last-child {
+                font-size: 1.4rem;
+            }
+
+            .choice-btn {
+                padding: 18px 25px;
+                font-size: 1.2rem;
+                touch-action: manipulation;
+            }
+
+            .typing-input {
+                font-size: 1.5rem;
+                padding: 18px;
+            }
+
+            .slider {
+                height: 20px;
+            }
+
+            .slider::-webkit-slider-thumb {
+                width: 40px;
+                height: 40px;
+            }
+
+            .slider::-moz-range-thumb {
+                width: 40px;
+                height: 40px;
+            }
+
+            .slider-value {
+                font-size: 2.5rem;
+                margin-top: 25px;
+            }
+
+            .celebration {
+                font-size: 3rem;
+            }
+
+            .progress-container {
+                margin-bottom: 30px;
+            }
+        }
+
+        /* Specific optimizations for iPhone 15 Pro Max and similar large phones */
+        @media (max-width: 430px) and (min-height: 900px) {
+            body {
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 40px 25px;
+            }
+
+            h1 {
+                font-size: 2.8rem;
+            }
+
+            h2 {
+                font-size: 2.2rem;
+            }
+
+            .btn {
+                padding: 20px 45px;
+                font-size: 1.4rem;
+            }
+
+            .love-letter {
+                padding: 35px 25px;
+            }
+        }
+
+        /* Prevent zoom on input focus for iOS */
+        @media (max-width: 768px) {
+            input[type="text"],
+            input[type="range"] {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Better touch targets */
+        @media (hover: none) and (pointer: coarse) {
+            .btn,
+            .choice-btn {
+                min-height: 50px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .btn:active {
+                transform: scale(0.98);
+            }
+
+            .choice-btn:active {
+                transform: translateX(5px) scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts-container" id="heartsContainer"></div>
+
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="progressText">Stage 1 of 5</div>
+        </div>
+
+        <!-- Stage 1: The Classic Question -->
+        <div class="stage active" id="stage1">
+            <div class="main-heart">♥</div>
+            <h1>Hey Menna!</h1>
+            <h2>Do you love me?</h2>
+            <div class="btn-container" id="btnContainer">
+                <button class="btn btn-yes" onclick="nextStage(2)">Yes! ♥</button>
+                <button class="btn btn-no" id="noBtn">No</button>
+            </div>
+        </div>
+
+        <!-- Stage 2: Slider -->
+        <div class="stage" id="stage2">
+            <div class="main-heart">💕</div>
+            <h2>How much do you love me?</h2>
+            <div class="slider-container">
+                <input type="range" min="0" max="100" value="50" class="slider" id="loveSlider">
+                <div class="slider-value" id="sliderValue">50%</div>
+            </div>
+            <button class="btn" onclick="nextStage(3)" style="margin-top: 40px;">Continue ♥</button>
+        </div>
+
+        <!-- Stage 3: Multiple Choice -->
+        <div class="stage" id="stage3">
+            <div class="main-heart">💖</div>
+            <h2>Complete this sentence:</h2>
+            <p class="subtitle">"You make me feel..."</p>
+            <div class="choices">
+                <button class="choice-btn" onclick="handleChoice(1)">...like the luckiest person alive ✨</button>
+                <button class="choice-btn" onclick="handleChoice(2)">...butterflies every single time 🦋</button>
+                <button class="choice-btn" onclick="handleChoice(3)">...complete and happy 🌟</button>
+                <button class="choice-btn" onclick="handleChoice(4)">...all of the above! 💕</button>
+            </div>
+        </div>
+
+        <!-- Stage 4: Typing Challenge -->
+        <div class="stage" id="stage4">
+            <div class="main-heart">💗</div>
+            <h2>Type the magic words:</h2>
+            <p class="subtitle">Hint: Three special words... ♥</p>
+            <div class="typing-container">
+                <input type="text" class="typing-input" id="magicInput" placeholder="Type here..." autocomplete="off">
+                <p class="hint" id="typingHint"></p>
+            </div>
+        </div>
+
+        <!-- Stage 5: Final Reveal -->
+        <div class="stage" id="stage5">
+            <div class="celebration">🎉 ♥ 🎊 ✨ 💕</div>
+            <h1>I knew it!</h1>
+            <div class="love-letter">
+                <p>
+                    Menna, I created this little game just to see you smile and to tell you 
+                    what my heart has been screaming all along...
+                </p>
+                <p>
+                    <strong>I love you more than words can express.</strong>
+                </p>
+                <p>
+                    Every moment with you is magical. You make my world brighter, 
+                    my heart fuller, and my life complete. The way you laugh, the way 
+                    you see the world, the way you make even ordinary days feel 
+                    extraordinary – it all makes me fall for you more every single day.
+                </p>
+                <p>
+                    Thank you for being you. Thank you for being mine.
+                </p>
+                <p>
+                    Forever yours ♥
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStage = 1;
+        const totalStages = 5;
+
+        // Generate floating hearts
+        const heartsContainer = document.getElementById('heartsContainer');
+        const heartSymbols = ['♥', '♡', '❤', '💕', '💗', '💖'];
+        
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 5 + 's';
+            heartsContainer.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 20000);
+        }
+
+        for (let i = 0; i < 15; i++) {
+            setTimeout(createHeart, i * 1000);
+        }
+        setInterval(createHeart, 2000);
+
+        // Update progress
+        function updateProgress(stage) {
+            const progress = (stage / totalStages) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Stage ${stage} of ${totalStages}`;
+        }
+
+        // Stage 1: Moving "No" button
+        const noBtn = document.getElementById('noBtn');
+        const btnContainer = document.getElementById('btnContainer');
+        
+        noBtn.addEventListener('mouseenter', moveNoButton);
+        noBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            moveNoButton(e);
+        });
+        
+        function moveNoButton(e) {
+            if (e) e.preventDefault();
+            
+            const btnRect = noBtn.getBoundingClientRect();
+            const yesBtn = document.querySelector('.btn-yes');
+            const yesBtnRect = yesBtn.getBoundingClientRect();
+            
+            // Calculate safe bounds with padding
+            const padding = 20;
+            const maxX = window.innerWidth - btnRect.width - padding;
+            const maxY = window.innerHeight - btnRect.height - padding;
+            
+            let newX, newY;
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            // Keep trying until we find a position that doesn't overlap with Yes button
+            do {
+                newX = padding + Math.random() * (maxX - padding);
+                newY = padding + Math.random() * (maxY - padding);
+                attempts++;
+            } while (
+                attempts < maxAttempts &&
+                Math.abs(newX - yesBtnRect.left) < 220 && 
+                Math.abs(newY - yesBtnRect.top) < 120
+            );
+            
+            // Ensure the button stays within viewport bounds
+            newX = Math.max(padding, Math.min(newX, maxX));
+            newY = Math.max(padding, Math.min(newY, maxY));
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+            
+            // Create sparkle effect at old position
+            createSparkle(btnRect.left + btnRect.width/2, btnRect.top + btnRect.height/2);
+        }
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.textContent = '✨';
+            sparkle.style.position = 'fixed';
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            sparkle.style.fontSize = '24px';
+            sparkle.style.pointerEvents = 'none';
+            sparkle.style.animation = 'sparkleAnim 1s ease-out forwards';
+            sparkle.style.zIndex = '1000';
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => sparkle.remove(), 1000);
+        }
+
+        // Add sparkle animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes sparkleAnim {
+                0% { transform: scale(0) rotate(0deg); opacity: 1; }
+                100% { transform: scale(1.5) rotate(180deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Stage 2: Slider (always goes to 100%)
+        const slider = document.getElementById('loveSlider');
+        const sliderValue = document.getElementById('sliderValue');
+        let targetValue = 100;
+        let currentValue = 50;
+
+        slider.addEventListener('input', function() {
+            // Gradually increase to 100% no matter what
+            targetValue = 100;
+            animateSlider();
+        });
+
+        // Also handle touch events for mobile
+        slider.addEventListener('touchmove', function() {
+            targetValue = 100;
+            animateSlider();
+        });
+
+        function animateSlider() {
+            if (currentValue < targetValue) {
+                currentValue += 2;
+                slider.value = currentValue;
+                sliderValue.textContent = Math.round(currentValue) + '%';
+                requestAnimationFrame(animateSlider);
+            } else {
+                sliderValue.textContent = '100% 💕';
+                sliderValue.style.color = 'var(--primary)';
+                sliderValue.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    sliderValue.style.transform = 'scale(1)';
+                }, 300);
+            }
+        }
+
+        // Prevent iOS double-tap zoom on buttons
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Stage 3: Multiple Choice (all answers work!)
+        function handleChoice(choice) {
+            const choices = document.querySelectorAll('.choice-btn');
+            choices.forEach((btn, index) => {
+                if (index + 1 === choice) {
+                    btn.style.background = 'linear-gradient(135deg, var(--primary), var(--secondary))';
+                    btn.style.color = 'white';
+                    btn.style.transform = 'scale(1.1)';
+                }
+            });
+            
+            setTimeout(() => {
+                nextStage(4);
+            }, 800);
+        }
+
+        // Stage 4: Typing Challenge
+        const magicInput = document.getElementById('magicInput');
+        const typingHint = document.getElementById('typingHint');
+        const correctPhrases = ['i love you', 'I love you', 'I LOVE YOU', 'i love u', 'I love u'];
+
+        // Scroll input into view when keyboard appears on mobile
+        magicInput.addEventListener('focus', function() {
+            setTimeout(() => {
+                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        });
+
+        magicInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            
+            if (correctPhrases.some(phrase => value.toLowerCase() === phrase.toLowerCase())) {
+                typingHint.textContent = 'Perfect! 💕';
+                typingHint.style.color = 'var(--primary)';
+                magicInput.style.borderColor = 'var(--primary)';
+                
+                setTimeout(() => {
+                    nextStage(5);
+                }, 1000);
+            } else if (value.length > 0) {
+                typingHint.textContent = 'Almost there... keep going! ♥';
+            }
+        });
+
+        // Navigate between stages
+        function nextStage(stage) {
+            document.getElementById('stage' + currentStage).classList.remove('active');
+            currentStage = stage;
+            document.getElementById('stage' + stage).classList.add('active');
+            updateProgress(stage);
+            
+            // Create celebration effect
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    createHeart();
+                }, i * 100);
+            }
+        }
+    </script>
+</body>
+</html>
